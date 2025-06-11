@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>בדיקת נתוני תלמיד</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      direction: rtl;
+      text-align: center;
+      padding: 40px;
+      background-color: #f5f5f5;
+    }
+
+    input {
+      padding: 8px;
+      font-size: 16px;
+      width: 250px;
+      margin-bottom: 10px;
+    }
+
+    button {
+      padding: 8px 16px;
+      font-size: 16px;
+      margin-right: 10px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #45a049;
+    }
+
+    #output {
+      text-align: right;
+      background: #fff;
+      padding: 30px;
+      border-radius: 16px;
+      border: 1px solid #ccc;
+      max-width: 600px;
+      margin: 20px auto;
+      white-space: pre-wrap;
+      font-size: 16px;
+      font-family: 'David', 'Arial', sans-serif;
+      line-height: 1.6;
+    }
+  </style>
+</head>
+<body>
+  <h2>בדיקת נתונים לפי תעודת זהות</h2>
+  <input type="text" id="idInput" placeholder="הקלד תעודת זהות" />
+  <button onclick="fetchData()">שלח</button>
+
+  <pre id="output"></pre>
+
+  <script>
+    async function fetchData() {
+      const id = document.getElementById('idInput').value.trim();
+      if (!/^\d{5,9}$/.test(id)) {
+        alert("אנא הזן תעודת זהות תקינה (5 עד 9 ספרות)");
+        return;
+      }
+
+      const url = `https://script.google.com/macros/s/AKfycbyreIlWtVHcbgrdRhp7qg5hj2e8r67ZSufxhbhb6PKG3lYVyyKCQwPnq2aQz__nd7h2/exec?id=${id}`;
+      const output = document.getElementById('output');
+      output.textContent = "טוען נתונים...";
+
+      try {
+        const response = await fetch(url);
+        const text = await response.text();
+        const json = JSON.parse(text);
+
+        if (Object.keys(json).length === 0) {
+          output.textContent = "לא נמצאו נתונים לתעודת הזהות.";
+          return;
+        }
+
+        let formatted = "";
+        for (let key in json) {
+          formatted += `${key}: ${json[key]}\n`;
+        }
+
+        output.textContent = formatted;
+      } catch (err) {
+        output.textContent = "שגיאה: תעודת זהות לא נמצאה או שיש בעיה בגישה לנתונים.";
+      }
+    }
+  </script>
+</body>
+</html>
